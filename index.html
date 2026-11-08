@@ -146,6 +146,15 @@ const { createClient } = supabase;
 const cartelsDB = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 console.log("Cartels.mv connected to Supabase!");
+  cartelsDB.from("categories")
+    .select("*")
+    .then(({ data, error }) => {
+        if (error) {
+            console.error("Connection error:", error);
+        } else {
+            console.log("Cartels categories loaded:", data);
+        }
+    });
 </script>
 </body>
     </html>
