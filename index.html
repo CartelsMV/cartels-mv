@@ -277,7 +277,7 @@
       const email=$("authEmail").value.trim(), password=$("authPassword").value;
       $("authSubmit").disabled=true; $("authStatus").textContent="Please wait…";
       let result;
-      if(authMode==="signup") result=await db.auth.signUp({email,password});
+      if(authMode==="signup") result=await db.auth.signUp({email,password,options:{emailRedirectTo:"https://cartelsmv.github.io/cartels-mv/"}});
       else result=await db.auth.signInWithPassword({email,password});
       $("authSubmit").disabled=false;
       if(result.error){$("authStatus").textContent=result.error.message;return;}
