@@ -1,172 +1,305 @@
-
 <!DOCTYPE html>
 <html lang="en">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-  
-testBox.style.cssText = "padding:15px;margin:15px;background:#e8f5e9;color:#111;border-radius:10px;font-weight:bold;";
-testBox.textContent = "Testing Cartels.mv database...";
-document.body.appendChild(testBox);
-
-cartelsDB.from("categories").select("id,name").then(({ data, error }) => {
-    testBox.textContent = error
-        ? "Database error: " + error.message
-        : "Connected successfully! Categories loaded: " + data.length;
-});
-</script><head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#101827">
-<title>Cartels.mv | Maldives Marketplace</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f4f6fa;color:#172033}
-header{background:#101827;color:white;padding:18px 16px}
-.brand{font-size:27px;font-weight:800;letter-spacing:-1px}
-.brand span{color:#36d399}
-.tagline{font-size:12px;color:#b9c3d3;margin-top:5px}
-nav{display:flex;gap:20px;margin-top:18px;overflow:auto}
-nav a{color:white;text-decoration:none;font-size:14px;white-space:nowrap}
-.hero{background:#172a43;color:white;padding:35px 20px}
-.hero h1{font-size:29px;margin:0 0 12px}
-.hero p{color:#c5d1e0;line-height:1.5}
-.search{display:flex;background:white;border-radius:10px;padding:5px;margin-top:20px}
-.search input{border:0;outline:0;min-width:0;flex:1;padding:12px;font-size:15px}
-.search button{border:0;background:#16a879;color:white;padding:12px;border-radius:7px}
-.sell{display:block;background:#16a879;color:white;text-align:center;padding:14px;border-radius:9px;text-decoration:none;font-weight:bold;margin-top:14px}
-main{padding:20px 15px;max-width:1000px;margin:auto}
-.section-title{font-size:20px;font-weight:bold;margin:8px 0 16px}
-.categories{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.category{background:white;padding:17px 5px;text-align:center;border-radius:12px;font-size:13px;box-shadow:0 2px 8px #00000008}
-.category .emoji{font-size:25px;display:block;margin-bottom:8px}
-.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
-.product{background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px #0000000b}
-.product-img{height:120px;background:#e8edf3;display:grid;place-items:center;font-size:48px}
-.product-info{padding:12px}
-.product h3{font-size:14px;margin:0 0 8px}
-.price{font-size:16px;color:#0c9a6a;font-weight:bold}
-.location{font-size:11px;color:#778196;margin-top:8px}
-footer{background:#101827;color:#c5d1e0;text-align:center;padding:25px 15px;font-size:12px;margin-top:30px}
-footer strong{color:#36d399}
-button{cursor:pointer}
-@media(min-width:650px){.products{grid-template-columns:repeat(3,1fr)}.categories{grid-template-columns:repeat(6,1fr)}.hero{padding:55px 8%}}
-</style>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#073b43">
+  <meta name="description" content="Cartels.mv — Buy and sell across the Maldives.">
+  <title>Cartels.mv — Maldives Marketplace</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --ink:#102f35; --muted:#687d80; --teal:#087f82; --teal-dark:#075b62;
+      --mint:#dff5ef; --sand:#f6f7f3; --white:#fff; --line:#e4ece9;
+      --shadow:0 12px 32px rgba(7,59,67,.08); --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--sand);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .wrap{width:min(1120px,calc(100% - 32px));margin:auto}
+    .topbar{background:#073b43;color:#d8f0eb;font-size:12px;padding:8px 0}
+    .topbar .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+    .nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:900;font-size:25px;letter-spacing:-1.2px}
+    .brand-mark{width:38px;height:38px;border-radius:13px;background:var(--teal);color:#fff;display:grid;place-items:center;font-size:19px}
+    .brand span:last-child{color:var(--teal)}
+    .navlinks{display:flex;gap:24px;align-items:center}
+    .navlinks a{color:#486064;text-decoration:none;font-size:14px;font-weight:650}
+    .actions{display:flex;gap:9px;align-items:center}
+    .btn{border:0;border-radius:12px;padding:11px 16px;font-weight:750}
+    .btn-primary{background:var(--teal);color:#fff}
+    .btn-primary:hover{background:var(--teal-dark)}
+    .btn-light{background:#edf7f4;color:var(--teal-dark)}
+    .btn-outline{background:#fff;color:var(--teal);border:1px solid #b9d9d3}
+    .hero{padding:48px 0 34px;background:linear-gradient(120deg,#e8f7f2 0%,#f8f7ef 62%,#e4f2f1 100%)}
+    .hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:center}
+    .eyebrow{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #d7ebe5;color:var(--teal-dark);padding:7px 11px;border-radius:99px;font-size:12px;font-weight:800}
+    h1{font-size:clamp(34px,5vw,56px);line-height:1.04;letter-spacing:-2px;margin:17px 0 13px;max-width:640px}
+    .hero p{font-size:16px;line-height:1.65;color:#526b6d;max-width:560px;margin:0}
+    .searchbox{margin-top:24px;background:#fff;border:1px solid #dce9e4;padding:7px;border-radius:15px;display:flex;gap:7px;box-shadow:var(--shadow);max-width:650px}
+    .searchbox input{min-width:0;flex:1;border:0;outline:0;padding:10px 12px;color:var(--ink)}
+    .hero-note{font-size:12px!important;margin-top:12px!important}
+    .hero-art{min-height:245px;border-radius:28px;background:#0c5960;position:relative;overflow:hidden;padding:26px;color:#fff;box-shadow:var(--shadow)}
+    .hero-art:before,.hero-art:after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.08)}
+    .hero-art:before{width:230px;height:230px;right:-55px;top:-75px}
+    .hero-art:after{width:170px;height:170px;left:-60px;bottom:-90px}
+    .island-emoji{font-size:72px;position:relative;z-index:1;margin-top:12px}
+    .art-title{font-size:22px;font-weight:850;position:relative;z-index:1}
+    .art-sub{color:#c6e8e1;font-size:13px;position:relative;z-index:1;margin-top:7px}
+    main{padding:30px 0 58px}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:0 0 17px}
+    .section-head h2{font-size:22px;letter-spacing:-.5px;margin:0}
+    .section-head p{margin:5px 0 0;color:var(--muted);font-size:13px}
+    .categories{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .cat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 13px;text-align:left;box-shadow:0 3px 12px rgba(7,59,67,.025);color:var(--ink)}
+    .cat:hover,.cat.active{border-color:#7bbdb2;background:#f0faf6}
+    .cat-icon{font-size:25px;display:block;margin-bottom:10px}
+    .cat-name{font-size:13px;font-weight:800}
+    .filters{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}
+    .filters select{border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#fff;color:#385357;min-width:155px}
+    .products{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+    .product{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 4px 15px rgba(7,59,67,.035)}
+    .product-art{height:142px;background:linear-gradient(145deg,#eaf5f1,#f5f3e9);display:grid;place-items:center;font-size:47px}
+    .product-info{padding:13px}
+    .product-title{font-size:14px;font-weight:800;margin:0 0 8px;line-height:1.4}
+    .product-price{font-size:17px;font-weight:900;color:var(--teal);margin-bottom:8px}
+    .product-location{font-size:11px;color:var(--muted)}
+    .empty{grid-column:1/-1;padding:30px;text-align:center;background:#fff;border:1px dashed #cbded8;border-radius:16px;color:var(--muted)}
+    .sell-banner{margin-top:34px;border-radius:22px;background:#073b43;color:#fff;padding:25px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .sell-banner h2{margin:0 0 7px;font-size:22px}
+    .sell-banner p{margin:0;color:#c5dfda;font-size:13px;line-height:1.5}
+    footer{background:#062f36;color:#c3d9d5;padding:28px 0;font-size:12px}
+    .foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    .foot strong{color:#fff;font-size:17px}
+    .status{font-size:12px;color:var(--muted);margin-top:12px;min-height:18px}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(3,30,34,.58);display:none;align-items:center;justify-content:center;padding:18px;z-index:30}
+    .modal-backdrop.open{display:flex}
+    .modal{width:min(430px,100%);background:#fff;border-radius:20px;padding:23px;box-shadow:0 20px 70px rgba(0,0,0,.2)}
+    .modal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .modal h2{font-size:22px;margin:0}
+    .close{border:0;background:#edf5f2;border-radius:10px;width:35px;height:35px;font-size:20px;color:#31575a}
+    .modal p{font-size:13px;color:var(--muted);line-height:1.5}
+    .field{display:block;margin:13px 0}
+    .field span{display:block;font-size:12px;font-weight:800;margin-bottom:6px;color:#355256}
+    .field input{width:100%;padding:12px;border:1px solid #d8e5e0;border-radius:11px;outline-color:var(--teal)}
+    .modal .btn{width:100%;margin-top:8px}
+    .switch-auth{text-align:center;font-size:13px;margin-top:14px}
+    .switch-auth button{border:0;background:none;color:var(--teal);font-weight:800}
+    @media(max-width:800px){.hero-grid{grid-template-columns:1fr}.hero-art{min-height:180px}.products{grid-template-columns:repeat(2,minmax(0,1fr))}.navlinks{display:none}}
+    @media(max-width:480px){.wrap{width:min(100% - 24px,1120px)}.nav{height:64px}.brand{font-size:22px}.actions .btn{padding:9px 11px;font-size:12px}.hero{padding:34px 0 26px}.hero-art{min-height:150px}.island-emoji{font-size:50px;margin-top:3px}.categories{grid-template-columns:repeat(2,1fr)}.section-head h2{font-size:19px}.sell-banner{align-items:flex-start;flex-direction:column}.searchbox button{padding:10px 12px}}
+  </style>
 </head>
 <body>
-<header>
-  <div class="brand">Cartels<span>.mv</span></div>
-  <div class="tagline">Maldives Marketplace — Everything in one place.</div>
-  <nav>
-    <a href="#">Home</a>
-    <a href="#categories">Categories</a>
-    <a href="#products">Explore products</a>
-    <a href="#sell">Sell with us</a>
-  </nav>
-</header>
+  <div class="topbar"><div class="wrap"><span>Made for the Maldives 🇲🇻</span><span>Buy local. Sell local. Connect everywhere.</span></div></div>
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="#"><span class="brand-mark">C</span><span>Cartels<span>.mv</span></span></a>
+      <nav class="navlinks"><a href="#categories">Categories</a><a href="#listings">Browse listings</a><a href="#sell">Start selling</a></nav>
+      <div class="actions"><button class="btn btn-light" id="loginBtn">Log in</button><button class="btn btn-primary" id="signupBtn">Join free</button></div>
+    </div>
+  </header>
 
-<section class="hero">
-  <h1>Discover. Buy. Sell.</h1>
-  <p>Your marketplace for the Maldives. Find great deals and connect with sellers across the islands.</p>
-  <div class="search">
-    <input id="search" placeholder="What are you looking for?">
-    <button onclick="searchProducts()">Search</button>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">🌴 Your island-to-island marketplace</span>
+        <h1>Good finds are closer than you think.</h1>
+        <p>Discover products and services from people across the Maldives. Browse local listings, find what you need, and connect with sellers.</p>
+        <div class="searchbox"><input id="searchInput" type="search" placeholder="What are you looking for?"><button class="btn btn-primary" id="searchBtn">Search</button></div>
+        <p class="hero-note">A growing marketplace for every atoll and island.</p>
+      </div>
+      <div class="hero-art"><div class="art-title">One marketplace.<br>Many islands.</div><div class="island-emoji">🏝️</div><div class="art-sub">Discover local deals from across the Maldives.</div></div>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <section id="categories">
+      <div class="section-head"><div><h2>Explore categories</h2><p>Find what you need, faster.</p></div></div>
+      <div class="categories" id="categoryGrid">
+        <div class="empty">Loading categories…</div>
+      </div>
+    </section>
+
+    <section id="listings" style="margin-top:34px">
+      <div class="section-head"><div><h2>Latest listings</h2><p>Explore active listings from across the islands.</p></div></div>
+      <div class="filters">
+        <select id="islandFilter"><option value="">All islands</option></select>
+        <select id="sortFilter"><option value="newest">Newest first</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select>
+      </div>
+      <div class="products" id="productGrid"><div class="empty">Loading listings…</div></div>
+      <div class="status" id="pageStatus" aria-live="polite"></div>
+    </section>
+
+    <section class="sell-banner" id="sell">
+      <div><h2>Have something to sell?</h2><p>Create a free account to get ready to join the Cartels.mv seller community.</p></div>
+      <button class="btn btn-primary" id="sellBtn">Create an account</button>
+    </section>
+  </main>
+
+  <footer><div class="wrap foot"><div><strong>Cartels.mv</strong><p>Connecting the Maldives, one marketplace.</p></div><div>© 2026 Cartels.mv · Built for the islands</div></div></footer>
+
+  <div class="modal-backdrop" id="authBackdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <div class="modal-top"><h2 id="authTitle">Welcome to Cartels.mv</h2><button class="close" id="closeModal" aria-label="Close">×</button></div>
+      <p id="authDescription">Log in to your account or create a free account to get started.</p>
+      <form id="authForm">
+        <label class="field"><span>Email address</span><input id="authEmail" type="email" required autocomplete="email" placeholder="you@example.com"></label>
+        <label class="field"><span>Password</span><input id="authPassword" type="password" required minlength="6" autocomplete="current-password" placeholder="At least 6 characters"></label>
+        <button class="btn btn-primary" id="authSubmit" type="submit">Log in</button>
+      </form>
+      <div class="switch-auth"><span id="switchText">New to Cartels.mv?</span> <button id="switchMode" type="button">Create account</button></div>
+      <div class="status" id="authStatus" aria-live="polite"></div>
+    </div>
   </div>
-  <a class="sell" href="#sell">+ Start selling</a>
-</section>
 
-<main>
-  <section id="categories">
-    <div class="section-title">Explore categories</div>
-    <div class="categories">
-      <div class="category"><span class="emoji">📱</span>Electronics</div>
-      <div class="category"><span class="emoji">👕</span>Fashion</div>
-      <div class="category"><span class="emoji">🏠</span>Home</div>
-      <div class="category"><span class="emoji">🚗</span>Vehicles</div>
-      <div class="category"><span class="emoji">🛠️</span>Services</div>
-      <div class="category"><span class="emoji">📦</span>Other</div>
-    </div>
-  </section>
+  <script>
+    // Public publishable key is intended for browser use. Never put a secret/service_role key here.
+    const SUPABASE_URL = "https://thxfvyrerjqdhmmwresz.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_HLjm6nA528EuHmp5pUwf8w_0CaMjSs2";
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  <section id="products" style="margin-top:30px">
-    <div class="section-title">Featured listings</div>
-    <div class="products" id="product-list">
-      <article class="product">
-        <div class="product-img">📱</div>
-        <div class="product-info">
-          <h3>Sample Smartphone</h3>
-          <div class="price">MVR 4,500</div>
-          <div class="location">📍 Malé</div>
-        </div>
-      </article>
-      <article class="product">
-        <div class="product-img">⌚</div>
-        <div class="product-info">
-          <h3>Sample Smart Watch</h3>
-          <div class="price">MVR 1,200</div>
-          <div class="location">📍 Hulhumalé</div>
-        </div>
-      </article>
-      <article class="product">
-        <div class="product-img">🎧</div>
-        <div class="product-info">
-          <h3>Sample Headphones</h3>
-          <div class="price">MVR 850</div>
-          <div class="location">📍 Addu City</div>
-        </div>
-      </article>
-      <article class="product">
-        <div class="product-img">👟</div>
-        <div class="product-info">
-          <h3>Sample Sneakers</h3>
-          <div class="price">MVR 950</div>
-          <div class="location">📍 Raa Atoll</div>
-        </div>
-      </article>
-    </div>
-    <p style="font-size:11px;color:#778196">Demo listings only. These are not real offers.</p>
-  </section>
+    const categoryIcons = {
+      "Electronics":"📱","Fashion":"👕","Home & Furniture":"🛋️","Vehicles":"🚗",
+      "Services":"🛠️","Sports":"⚽","Beauty":"✨","Other":"📦"
+    };
+    let categories = [], islands = [], products = [], selectedCategory = "";
+    let authMode = "login";
 
-  <section id="sell" style="margin-top:30px;background:white;padding:20px;border-radius:12px">
-    <h2>Have something to sell?</h2>
-    <p>Cartels.mv is where Maldivians connect to buy and sell.</p>
-    <p style="font-size:13px;color:#778196">Seller registration and product posting will be activated in a future version.</p>
-    <a class="sell" href="mailto:hello@cartels.mv?subject=Selling%20on%20Cartels.mv">Contact us</a>
-  </section>
-</main>
+    const $ = id => document.getElementById(id);
+    function setStatus(message){ $("pageStatus").textContent = message || ""; }
+    function money(value){ return "MVR " + Number(value || 0).toLocaleString("en-US"); }
 
-<footer>
-  <strong>Cartels.mv</strong>
-  <p>Connecting the Maldives, one marketplace.</p>
-  <p>© 2026 Cartels.mv. All rights reserved.</p>
-</footer>
+    async function loadMarketplace(){
+      const [catResult, islandResult, productResult] = await Promise.all([
+        db.from("categories").select("id,name").order("id"),
+        db.from("islands").select("id,island_name,atoll").order("island_name"),
+        db.from("products").select("id,category_id,island_id,title,description,price,condition,created_at").eq("status","active").order("created_at",{ascending:false})
+      ]);
+      if(catResult.error) $("categoryGrid").innerHTML = '<div class="empty">Could not load categories. Please refresh the page.</div>';
+      else { categories = catResult.data || []; renderCategories(); }
+      islands = islandResult.data || [];
+      renderIslandFilter();
+      if(productResult.error){
+        $("productGrid").innerHTML = '<div class="empty">Listings could not be loaded right now.</div>';
+        setStatus("Database message: " + productResult.error.message);
+      } else {
+        products = productResult.data || [];
+        renderProducts();
+        setStatus(products.length ? "" : "No active listings yet. Check back as the marketplace grows.");
+      }
+    }
 
-<script>
-function searchProducts(){
-  const query=document.getElementById('search').value.toLowerCase();
-  const cards=document.querySelectorAll('.product');
-  cards.forEach(card=>{
-    card.style.display=card.innerText.toLowerCase().includes(query)?'block':'none';
-  });
-  document.getElementById('products').scrollIntoView({behavior:'smooth'});
-}
-</script>
-<script>
-const SUPABASE_URL = "https://thxfvyrerjqdhmmwresz.supabase.co";
-const SUPABASE_KEY = "sb_publishable_HLjm6nA528EuHmp5pUwf8w_0CaMjSs2";
+    function renderCategories(){
+      const grid = $("categoryGrid");
+      grid.innerHTML = "";
+      const all = document.createElement("button");
+      all.className = "cat" + (!selectedCategory ? " active" : "");
+      all.innerHTML = '<span class="cat-icon">🌐</span><span class="cat-name">All categories</span>';
+      all.addEventListener("click",()=>{selectedCategory="";renderCategories();renderProducts();});
+      grid.appendChild(all);
+      categories.forEach(cat=>{
+        const button = document.createElement("button");
+        button.className = "cat" + (String(selectedCategory)===String(cat.id) ? " active" : "");
+        const icon = categoryIcons[cat.name] || "📦";
+        button.innerHTML = '<span class="cat-icon">'+icon+'</span><span class="cat-name"></span>';
+        button.querySelector(".cat-name").textContent = cat.name;
+        button.addEventListener("click",()=>{selectedCategory=String(cat.id);renderCategories();renderProducts();});
+        grid.appendChild(button);
+      });
+    }
 
-const { createClient } = supabase;
-const cartelsDB = createClient(SUPABASE_URL, SUPABASE_KEY);
+    function renderIslandFilter(){
+      const select = $("islandFilter");
+      select.innerHTML = '<option value="">All islands</option>';
+      islands.forEach(island=>{
+        const option = document.createElement("option");
+        option.value = island.id;
+        option.textContent = island.island_name + (island.atoll ? " · " + island.atoll : "");
+        select.appendChild(option);
+      });
+    }
 
-console.log("Cartels.mv connected to Supabase!");
-  cartelsDB.from("categories")
-    .select("*")
-    .then(({ data, error }) => {
-        if (error) {
-            console.error("Connection error:", error);
-        } else {
-            console.log("Cartels categories loaded:", data);
-        }
+    function renderProducts(){
+      const grid = $("productGrid");
+      const query = $("searchInput").value.trim().toLowerCase();
+      const islandId = $("islandFilter").value;
+      let filtered = products.filter(p=>{
+        const cat = categories.find(c=>String(c.id)===String(p.category_id));
+        const island = islands.find(i=>String(i.id)===String(p.island_id));
+        const haystack = [p.title,p.description,cat?.name,island?.island_name,island?.atoll].join(" ").toLowerCase();
+        return (!selectedCategory || String(p.category_id)===selectedCategory) &&
+          (!islandId || String(p.island_id)===islandId) && (!query || haystack.includes(query));
+      });
+      const sort = $("sortFilter").value;
+      if(sort==="low") filtered.sort((a,b)=>Number(a.price)-Number(b.price));
+      if(sort==="high") filtered.sort((a,b)=>Number(b.price)-Number(a.price));
+      if(!filtered.length){grid.innerHTML='<div class="empty">No matching listings yet.</div>';return;}
+      grid.innerHTML="";
+      filtered.forEach(p=>{
+        const cat = categories.find(c=>String(c.id)===String(p.category_id));
+        const island = islands.find(i=>String(i.id)===String(p.island_id));
+        const card = document.createElement("article");
+        card.className="product";
+        const art=document.createElement("div"); art.className="product-art"; art.textContent=categoryIcons[cat?.name]||"📦";
+        const info=document.createElement("div"); info.className="product-info";
+        const title=document.createElement("h3"); title.className="product-title"; title.textContent=p.title;
+        const price=document.createElement("div"); price.className="product-price"; price.textContent=money(p.price);
+        const location=document.createElement("div"); location.className="product-location";
+        location.textContent="📍 "+(island ? island.island_name+(island.atoll?", "+island.atoll:"") : "Maldives");
+        info.append(title,price,location); card.append(art,info); grid.appendChild(card);
+      });
+    }
+
+    function openAuth(mode){
+      authMode=mode; $("authBackdrop").classList.add("open"); updateAuthMode(); $("authStatus").textContent="";
+    }
+    function closeAuth(){ $("authBackdrop").classList.remove("open"); }
+    function updateAuthMode(){
+      const signup=authMode==="signup";
+      $("authTitle").textContent=signup?"Create your account":"Welcome back";
+      $("authDescription").textContent=signup?"Join Cartels.mv with your email address.":"Log in to your Cartels.mv account.";
+      $("authSubmit").textContent=signup?"Create account":"Log in";
+      $("switchText").textContent=signup?"Already have an account?":"New to Cartels.mv?";
+      $("switchMode").textContent=signup?"Log in":"Create account";
+      $("authPassword").autocomplete=signup?"new-password":"current-password";
+    }
+    $("loginBtn").addEventListener("click",()=>openAuth("login"));
+    $("signupBtn").addEventListener("click",()=>openAuth("signup"));
+    $("sellBtn").addEventListener("click",()=>openAuth("signup"));
+    $("closeModal").addEventListener("click",closeAuth);
+    $("authBackdrop").addEventListener("click",e=>{if(e.target===$("authBackdrop"))closeAuth();});
+    $("switchMode").addEventListener("click",()=>{authMode=authMode==="login"?"signup":"login";updateAuthMode();$("authStatus").textContent="";});
+    $("authForm").addEventListener("submit",async e=>{
+      e.preventDefault();
+      const email=$("authEmail").value.trim(), password=$("authPassword").value;
+      $("authSubmit").disabled=true; $("authStatus").textContent="Please wait…";
+      let result;
+      if(authMode==="signup") result=await db.auth.signUp({email,password});
+      else result=await db.auth.signInWithPassword({email,password});
+      $("authSubmit").disabled=false;
+      if(result.error){$("authStatus").textContent=result.error.message;return;}
+      if(authMode==="signup"){
+        $("authStatus").textContent="Account created. Please check your email to confirm your address before logging in.";
+      } else {
+        $("authStatus").textContent="You are logged in successfully.";
+        setTimeout(closeAuth,1200);
+        $("loginBtn").textContent="Account";
+        $("signupBtn").textContent="Logged in";
+      }
     });
-</script>
+    $("searchBtn").addEventListener("click",renderProducts);
+    $("searchInput").addEventListener("keydown",e=>{if(e.key==="Enter")renderProducts();});
+    $("islandFilter").addEventListener("change",renderProducts);
+    $("sortFilter").addEventListener("change",renderProducts);
+
+    loadMarketplace().catch(error=>{
+      $("categoryGrid").innerHTML='<div class="empty">Marketplace data is temporarily unavailable.</div>';
+      $("productGrid").innerHTML='<div class="empty">Please refresh and try again.</div>';
+      setStatus(error.message || "Unexpected loading error.");
+    });
+  </script>
 </body>
-    </html>
-    
+</html>
