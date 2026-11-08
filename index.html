@@ -138,6 +138,15 @@ function searchProducts(){
   document.getElementById('products').scrollIntoView({behavior:'smooth'});
 }
 </script>
+<script>
+const SUPABASE_URL = "https://thxfvyrerjqdhmmwresz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_HLjm6nA528EuHmp5pUwf8w_0CaMjSs2";
+
+const { createClient } = supabase;
+const cartelsDB = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+console.log("Cartels.mv connected to Supabase!");
+</script>
 </body>
     </html>
     
