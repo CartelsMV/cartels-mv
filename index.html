@@ -1,7 +1,18 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+  const testBox = document.createElement("div");
+testBox.style.cssText = "padding:15px;margin:15px;background:#e8f5e9;color:#111;border-radius:10px;font-weight:bold;";
+testBox.textContent = "Testing Cartels.mv database...";
+document.body.appendChild(testBox);
+
+cartelsDB.from("categories").select("id,name").then(({ data, error }) => {
+    testBox.textContent = error
+        ? "Database error: " + error.message
+        : "Connected successfully! Categories loaded: " + data.length;
+});
+</script><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#101827">
